@@ -1,8 +1,14 @@
 package ru.mts.thirdhw.entity;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 public interface Animal {
+    /**
+     * @return Дата рождения животного
+     * */
+
+    LocalDate getBirthDate();
     /**
      * @return Порода животного
      * */
@@ -19,4 +25,5 @@ public interface Animal {
      * @return Характер животного
      * */
     String getCharacter();
+
 }
