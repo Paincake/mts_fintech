@@ -43,6 +43,20 @@ public class Crocodile extends Predator {
         int result = 133;
         return result * breed.hashCode() + name.hashCode() * birthDate.hashCode() * character.hashCode();
     }
+    @Override
+    public boolean equals(Object obj) {
+        if(this == obj) return true;
+        if(obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        };
+        Crocodile other = (Crocodile) obj;
+        return breed.equals(other.breed) &&
+                name.equals(other.name) &&
+                cost.equals(other.cost) &&
+                character.equals(other.character) &&
+                birthDate.equals(other.birthDate);
+
+    }
 
 
 }

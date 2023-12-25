@@ -50,7 +50,8 @@ public class Cat extends Pet {
         return breed.equals(other.breed) &&
                 name.equals(other.name) &&
                 cost.equals(other.cost) &&
-                character.equals(other.character);
+                character.equals(other.character) &&
+                birthDate.equals(other.birthDate);
 
     }
 
