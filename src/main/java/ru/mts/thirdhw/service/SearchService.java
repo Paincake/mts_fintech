@@ -19,8 +19,13 @@ public interface SearchService {
      * */
     List<Animal> findOlderAnimal(List<Animal> animalList, int lowerAge);
     /**
-     * Находит дубликаты животных и выводит их на экран
+     * Находит дубликаты животных и возвращает список дубликатов
      * @param animalList Список животных
      * */
-    void findDuplicate(List<Animal> animalList);
+    List<Animal> findDuplicate(List<Animal> animalList);
+    /**
+     * Вызывает findDuplicate и выводит результат в стандартный поток
+     * @param animalList Список животных
+     * */
+    void printDuplicate(List<Animal> animalList);
 }

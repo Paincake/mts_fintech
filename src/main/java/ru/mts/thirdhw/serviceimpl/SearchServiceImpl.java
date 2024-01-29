@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+
 public class SearchServiceImpl implements SearchService {
     @Override
     public List<String> findLeapYearNames(List<Animal> animalList) {
@@ -34,7 +35,7 @@ public class SearchServiceImpl implements SearchService {
         for(Animal animal : animalList) {
             if(animal == null) continue;
             long years = ChronoUnit.YEARS.between(LocalDate.now(), animal.getBirthDate());
-            if(years > lowerAge) {
+            if(Math.abs(years) > lowerAge) {
                 olderAnimalList.add(animal);
             }
         }
@@ -42,16 +43,26 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public void findDuplicate(List<Animal> animalList) {
-        if(animalList == null) return;
+    public List<Animal> findDuplicate(List<Animal> animalList) {
+        if(animalList == null) return null;
         Set<Animal> animalSet = new HashSet<>();
+        List<Animal> duplicateList = new ArrayList<>();
         for(Animal animal : animalList) {
             if(animal != null && animalSet.contains(animal)) {
-                System.out.println(animal.getName());
+                duplicateList.add(animal);
             }
             else if(animal != null) {
                 animalSet.add(animal);
             }
+        }
+        return duplicateList;
+    }
+
+    @Override
+    public void printDuplicate(List<Animal> animalList) {
+        List<Animal> duplicates = findDuplicate(animalList);
+        for(Animal animal : duplicates) {
+            System.out.println(animal);
         }
     }
 }
