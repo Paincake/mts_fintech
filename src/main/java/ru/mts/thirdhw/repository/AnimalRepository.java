@@ -1,31 +1,32 @@
-package ru.mts.thirdhw.service;
+package ru.mts.thirdhw.repository;
 
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.mts.thirdhw.entity.Animal;
 
 import java.util.List;
 
-public interface SearchService {
+@Component
+public interface AnimalRepository {
     /**
      * Находит животных, которые родились в високосный год
      * @return Список имён животных
-     * @param animalList Список животных
      * */
-    List<String> findLeapYearNames(List<Animal> animalList);
+    List<String> findLeapYearNames();
     /**
      * Находит животных, которые старше чем lowerAge
      * @return Список животных
-     * @param animalList Список животных
+
      * @param lowerAge Нижняя граница возраста
      * */
-    List<Animal> findOlderAnimal(List<Animal> animalList, int lowerAge);
+    List<Animal> findOlderAnimal(int lowerAge);
     /**
      * Находит дубликаты животных и возвращает список дубликатов
-     * @param animalList Список животных
+
      * */
-    List<Animal> findDuplicate(List<Animal> animalList);
+    List<Animal> findDuplicate();
     /**
      * Вызывает findDuplicate и выводит результат в стандартный поток
-     * @param animalList Список животных
      * */
-    void printDuplicate(List<Animal> animalList);
+    void printDuplicate();
 }
