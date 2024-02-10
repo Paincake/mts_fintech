@@ -1,6 +1,6 @@
 package ru.mts.thirdhw.repositoryimpl;
 
-import jakarta.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -9,12 +9,14 @@ import ru.mts.thirdhw.entity.Animal;
 import ru.mts.thirdhw.repository.AnimalRepository;
 import ru.mts.thirdhw.serviceimpl.CreateAnimalServiceImpl;
 
+import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 
 
 @Component
@@ -25,6 +27,7 @@ public class AnimalRepositoryImpl implements AnimalRepository {
     private CreateAnimalServiceImpl createAnimalService;
     @PostConstruct
     public void init(){
+        animalList = new ArrayList<>();
         animalList.addAll(createAnimalService.createAnimals(10));
     }
     @Override
@@ -79,5 +82,13 @@ public class AnimalRepositoryImpl implements AnimalRepository {
         for(Animal animal : duplicates) {
             System.out.println(animal);
         }
+    }
+
+    public List<Animal> getAnimalList() {
+        return animalList;
+    }
+
+    public void setAnimalList(List<Animal> animalList) {
+        this.animalList = animalList;
     }
 }
