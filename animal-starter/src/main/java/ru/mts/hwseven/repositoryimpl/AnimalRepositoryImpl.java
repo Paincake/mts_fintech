@@ -21,10 +21,14 @@ import java.util.Set;
 
 
 @Component
-
 public class AnimalRepositoryImpl implements AnimalRepository {
     private List<Animal> animalList;
+
     @Autowired
+    public AnimalRepositoryImpl(CreateAnimalServiceImpl createAnimalService) {
+        this.createAnimalService = createAnimalService;
+    }
+
     private CreateAnimalServiceImpl createAnimalService;
     @PostConstruct
     public void init(){
@@ -101,9 +105,5 @@ public class AnimalRepositoryImpl implements AnimalRepository {
 
     public List<Animal> getAnimalList() {
         return animalList;
-    }
-
-    public void setAnimalList(List<Animal> animalList) {
-        this.animalList = animalList;
     }
 }
