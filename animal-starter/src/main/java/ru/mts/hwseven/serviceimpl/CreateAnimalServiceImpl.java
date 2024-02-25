@@ -9,7 +9,9 @@ import ru.mts.hwseven.factory.SimpleAnimalFactory;
 import ru.mts.hwseven.service.CreateAnimalService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Component
@@ -25,13 +27,15 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
     }
 
     @Override
-    public List<Animal> createAnimals() {
+    public Map<String, List<Animal>> createAnimals() {
         SimpleAnimalFactory simpleAnimalFactory = new SimpleAnimalFactory();
         List<Animal> animalList = new ArrayList<>();
         for(int i = 0; i < 10; i++) {
             animalList.add(simpleAnimalFactory.createAnimal(animalType));
         }
-        return animalList;
+        Map<String, List<Animal>> animalMap = new HashMap<>();
+        animalMap.put(animalType.name(), animalList);
+        return animalMap;
     }
 
     public AnimalType getAnimalType() {

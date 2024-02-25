@@ -4,7 +4,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.mts.hwseven.entity.Animal;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public interface AnimalRepository {
@@ -12,19 +14,19 @@ public interface AnimalRepository {
      * Находит животных, которые родились в високосный год
      * @return Список имён животных
      * */
-    List<String> findLeapYearNames();
+    Map<String, LocalDate> findLeapYearNames();
     /**
      * Находит животных, которые старше чем lowerAge
      * @return Список животных
 
      * @param lowerAge Нижняя граница возраста
      * */
-    List<Animal> findOlderAnimal(int lowerAge);
+    Map<Animal, Integer> findOlderAnimal(int lowerAge);
     /**
      * Находит дубликаты животных и возвращает список дубликатов
 
      * */
-    List<Animal> findDuplicate();
+    Map<String, Integer> findDuplicate();
     /**
      * Вызывает findDuplicate и выводит результат в стандартный поток
      * */

@@ -4,22 +4,21 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ru.mts.hwseven.entity.Animal;
+import ru.mts.hwseven.entity.AnimalType;
 import ru.mts.hwseven.entity.Cat;
 import ru.mts.hwseven.entity.Crocodile;
 import ru.mts.hwseven.util.DateGenerator;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Component
 @Scope("prototype")
 public interface CreateAnimalService {
 
-    default List<Animal> createAnimals() {
+    default Map<String, List<Animal>> createAnimals() {
         Random random = new Random();
-        List<Animal> animals = new ArrayList<>();
+        Map<String, List<Animal>> animals = new HashMap<>();
         int count = 1;
         while(animals.size() != 10) {
             Animal newCroc = new Crocodile(
@@ -44,8 +43,10 @@ public interface CreateAnimalService {
             System.out.printf("Кошка с именем %s, породой %s, стоимостью %s и характером %s создан\n",
                     newCat.getName(), newCat.getBreed(), newCat.getCost().toString(), newCat.getCharacter());
 
-            animals.add(newCroc);
-            animals.add(newCat);
+            animals.putIfAbsent(AnimalType.CROCODILE.name(), new ArrayList<>());
+            animals.get(AnimalType.CROCODILE.name()).add(newCroc);
+            animals.putIfAbsent(AnimalType.CAT.name(), new ArrayList<>());
+            animals.get(AnimalType.CAT.name()).add(newCat);
             count++;
         }
         return animals;

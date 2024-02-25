@@ -13,11 +13,7 @@ import ru.mts.hwseven.serviceimpl.CreateAnimalServiceImpl;
 import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import java.util.*;
 
 
 @Component
@@ -33,59 +29,56 @@ public class AnimalRepositoryImpl implements AnimalRepository {
     @PostConstruct
     public void init(){
         animalList = new ArrayList<>();
-        animalList.addAll(createAnimalService.createAnimals(10));
+        animalList.addAll(createAnimalService.createAnimals(3));
     }
     @Override
-    public List<String> findLeapYearNames() {
-        if(animalList == null) return new ArrayList<>();
-        List<String> animalNamesList = new ArrayList<>();
+    public Map<String, LocalDate> findLeapYearNames() {
+        if(animalList == null) return new HashMap<>();
+        Map<String, LocalDate> animalMap = new HashMap<>();
         for(Animal animal : animalList) {
             if(
                     animal != null &&
                     animal.getBirthDate() != null &&
                     animal.getBirthDate().isLeapYear()
             ){
-                animalNamesList.add(animal.getName());
+                animalMap.put(animal.getName() + " " + createAnimalService.getAnimalType().name(), animal.getBirthDate());
             }
         }
-        return animalNamesList;
+        return animalMap;
     }
 
     @Override
-    public List<Animal> findOlderAnimal(int lowerAge) {
-        if(animalList == null) return new ArrayList<>();
-        List<Animal> olderAnimalList = new ArrayList<>();
+    public Map<Animal, Integer> findOlderAnimal(int lowerAge) {
+        if(animalList == null) return new HashMap<>();
+        Map<Animal, Integer> animalMap = new HashMap<>();
         for(Animal animal : animalList) {
             if(animal == null) continue;
             long years = ChronoUnit.YEARS.between(LocalDate.now(), animal.getBirthDate());
             if(Math.abs(years) > lowerAge) {
-                olderAnimalList.add(animal);
+                animalMap.put(animal, (int)years);
             }
         }
-        return olderAnimalList;
+        return animalMap;
     }
 
     @Override
-    public List<Animal> findDuplicate() {
+    public Map<String, Integer> findDuplicate() {
         if(animalList == null) return null;
-        Set<Animal> animalSet = new HashSet<>();
-        List<Animal> duplicateList = new ArrayList<>();
+        Map<String, Integer> animalMap = new HashMap<>();
         for(Animal animal : animalList) {
-            if(animal != null && animalSet.contains(animal)) {
-                duplicateList.add(animal);
-            }
-            else if(animal != null) {
-                animalSet.add(animal);
-            }
+            animalMap.put(
+                    createAnimalService.getAnimalType().name(),
+                    animalMap.getOrDefault(createAnimalService.getAnimalType().name(), 0) + 1
+            );
         }
-        return duplicateList;
+        return animalMap;
     }
 
     @Override
     public void printDuplicate() {
-        List<Animal> duplicates = findDuplicate();
-        for(Animal animal : duplicates) {
-            System.out.println(animal);
+        Map<String, Integer> duplicates = findDuplicate();
+        for(Map.Entry<String, Integer> duplicate : duplicates.entrySet()) {
+            System.out.println(duplicate.getKey() + " " + duplicate.getValue());
         }
     }
 
@@ -93,12 +86,14 @@ public class AnimalRepositoryImpl implements AnimalRepository {
     public void callAllMethods() {
         printDuplicate();
         System.out.println("\nOlder animals:");
-        for(Animal animal : findOlderAnimal(10)) {
-            System.out.println(animal.getName());
+        for(Map.Entry<Animal, Integer> animalEntry : findOlderAnimal(10).entrySet()) {
+            System.out.printf("%s %s ", animalEntry.getKey(), animalEntry.getValue());
+            System.out.println();
         }
         System.out.println("\nLeap year names:");
-        for(String s : findLeapYearNames()) {
-            System.out.println(s);
+        for(Map.Entry<String, LocalDate> animalEntry : findLeapYearNames().entrySet()) {
+            System.out.printf("%s %s ", animalEntry.getKey(), animalEntry.getValue());
+            System.out.println();
         }
     }
 
