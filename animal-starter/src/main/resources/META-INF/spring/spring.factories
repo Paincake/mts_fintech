@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+    ru.mts.hwseven.repositoryimpl.AnimalRepositoryImpl, ru.mts.hwseven.config.BeanConfig
