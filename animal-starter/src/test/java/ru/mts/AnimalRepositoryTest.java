@@ -22,6 +22,7 @@ import ru.mts.hwseven.serviceimpl.CreateAnimalServiceImpl;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -42,7 +43,7 @@ public class AnimalRepositoryTest {
     @DisplayName("Testing leap year names finding")
     @Test
     public void findLeapYearNames_shouldReturnEqualMap() {
-        Mockito.when(animalRepository.findLeapYearNames()).thenReturn(Map.of("TEST_NAME_ONE CAT", LocalDate.now(),"TEST_NAME_ONE CAT", LocalDate.now(), "TEST_NAME_ONE CAT", LocalDate.now()));
+        Mockito.when(animalRepository.findLeapYearNames()).thenReturn(Map.of("TEST_NAME_ONE CAT", LocalDate.now()));
         System.out.println("a");
     }
 
@@ -55,13 +56,37 @@ public class AnimalRepositoryTest {
         Mockito.when(animalRepository.findOlderAnimal(0)).thenReturn(givenMap);
     }
 
+    @DisplayName("Testing finding duplicates")
     @Test
     public void testFindDuplicate_shouldReturnGivenMap() {
         LocalDate oldBirthDate = LocalDate.now();
-        Map<String, Integer> animalMap = Map.of(
-            "CAT", 3
-        );
+        Map<String, List<Animal>> animalMap = Map.of(
+            "CAT", List.of(
+                        new Cat("simple cat breed", "TEST_NAME_ONE", new BigDecimal("10"), "simple cat character", oldBirthDate),
+                        new Cat("simple cat breed", "TEST_NAME_ONE", new BigDecimal("10"), "simple cat character", oldBirthDate),
+                        new Cat("simple cat breed", "TEST_NAME_ONE", new BigDecimal("10"), "simple cat character", oldBirthDate)
+        ));
         Mockito.when(animalRepository.findDuplicate()).thenReturn(animalMap);
     }
+
+    @DisplayName("Testing average age finding")
+    @Test
+    public void testFindAverageAge_shouldReturnGivenValue() {
+        Mockito.when(animalRepository.findAverageAge()).thenReturn(BigDecimal.valueOf(10.0));
+    }
+
+    @DisplayName("Testing finding old and expensive animals")
+    @Test
+    public void testFindOldAndExpensive_shouldReturnEmptyList() {
+        Mockito.when(animalRepository.findOldAndExpensive()).thenReturn(new ArrayList<>());
+    }
+
+    @DisplayName("Testing finding min cost animals")
+    @Test
+    public void testFindMinCostAnimals_shouldReturnGivenList() {
+        Mockito.when(animalRepository.findMinCostAnimals()).thenReturn(List.of("TEST_NAME_ONE", "TEST_NAME_ONE", "TEST_NAME_ONE"));
+
+    }
+
 
 }
