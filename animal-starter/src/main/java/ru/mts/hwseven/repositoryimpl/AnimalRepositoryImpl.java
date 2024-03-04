@@ -36,8 +36,8 @@ public class AnimalRepositoryImpl implements AnimalRepository {
         if(animalList == null) return new HashMap<>();
         Map<String, LocalDate> animalMap = new HashMap<>();
         animalList.stream()
-                .filter(a -> a != null && a.getBirthDate() != null && a.getBirthDate().isLeapYear())
-                .forEach(a -> animalMap.put(a.getName() + " " + createAnimalService.getAnimalType().name(), a.getBirthDate()));
+                .filter(animal -> animal != null && animal.getBirthDate() != null && animal.getBirthDate().isLeapYear())
+                .forEach(animal -> animalMap.put(animal.getName() + " " + createAnimalService.getAnimalType().name(), animal.getBirthDate()));
         return animalMap;
     }
 
@@ -46,8 +46,8 @@ public class AnimalRepositoryImpl implements AnimalRepository {
         if(animalList == null) return new HashMap<>();
         Map<Animal, Integer> animalMap = new HashMap<>();
         animalList.stream()
-                .filter(a -> a != null && Math.abs(ChronoUnit.YEARS.between(LocalDate.now(), a.getBirthDate())) > lowerAge)
-                .forEach(a -> animalMap.put(a, (int)ChronoUnit.YEARS.between(LocalDate.now(), a.getBirthDate())));
+                .filter(animal -> animal != null && Math.abs(ChronoUnit.YEARS.between(LocalDate.now(), animal.getBirthDate())) > lowerAge)
+                .forEach(animal -> animalMap.put(animal, (int)ChronoUnit.YEARS.between(LocalDate.now(), animal.getBirthDate())));
         return animalMap;
     }
 
@@ -63,7 +63,7 @@ public class AnimalRepositoryImpl implements AnimalRepository {
     @Override
     public BigDecimal findAverageAge() {
        double cost = animalList.stream()
-               .mapToInt(a -> Math.toIntExact(ChronoUnit.YEARS.between(LocalDate.now(), a.getBirthDate())))
+               .mapToInt(animal -> Math.toIntExact(ChronoUnit.YEARS.between(LocalDate.now(), animal.getBirthDate())))
                .average().orElse(0.0);
        return new BigDecimal(cost);
     }
@@ -71,7 +71,7 @@ public class AnimalRepositoryImpl implements AnimalRepository {
     @Override
     public List<Animal> findOldAndExpensive() {
         return animalList.stream()
-                .filter(a -> Math.toIntExact(ChronoUnit.YEARS.between(LocalDate.now(), a.getBirthDate())) > 5 && a.getCost().compareTo(findAverageAge()) > 0)
+                .filter(animal -> Math.toIntExact(ChronoUnit.YEARS.between(LocalDate.now(), animal.getBirthDate())) > 5 && animal.getCost().compareTo(findAverageAge()) > 0)
                 .sorted(Comparator.comparing(Animal::getBirthDate))
                 .collect(Collectors.toList());
     }
