@@ -2,18 +2,18 @@ package ru.mts.hwseven.repositoryimpl;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 import ru.mts.hwseven.entity.Animal;
 import ru.mts.hwseven.repository.AnimalRepository;
 import ru.mts.hwseven.serviceimpl.CreateAnimalServiceImpl;
 
 import javax.annotation.PostConstruct;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Component
@@ -35,15 +35,9 @@ public class AnimalRepositoryImpl implements AnimalRepository {
     public Map<String, LocalDate> findLeapYearNames() {
         if(animalList == null) return new HashMap<>();
         Map<String, LocalDate> animalMap = new HashMap<>();
-        for(Animal animal : animalList) {
-            if(
-                    animal != null &&
-                    animal.getBirthDate() != null &&
-                    animal.getBirthDate().isLeapYear()
-            ){
-                animalMap.put(animal.getName() + " " + createAnimalService.getAnimalType().name(), animal.getBirthDate());
-            }
-        }
+        animalList.stream()
+                .filter(a -> a != null && a.getBirthDate() != null && a.getBirthDate().isLeapYear())
+                .forEach(a -> animalMap.put(a.getName() + " " + createAnimalService.getAnimalType().name(), a.getBirthDate()));
         return animalMap;
     }
 
@@ -51,33 +45,51 @@ public class AnimalRepositoryImpl implements AnimalRepository {
     public Map<Animal, Integer> findOlderAnimal(int lowerAge) {
         if(animalList == null) return new HashMap<>();
         Map<Animal, Integer> animalMap = new HashMap<>();
-        for(Animal animal : animalList) {
-            if(animal == null) continue;
-            long years = ChronoUnit.YEARS.between(LocalDate.now(), animal.getBirthDate());
-            if(Math.abs(years) > lowerAge) {
-                animalMap.put(animal, (int)years);
-            }
-        }
+        animalList.stream()
+                .filter(a -> a != null && Math.abs(ChronoUnit.YEARS.between(LocalDate.now(), a.getBirthDate())) > lowerAge)
+                .forEach(a -> animalMap.put(a, (int)ChronoUnit.YEARS.between(LocalDate.now(), a.getBirthDate())));
         return animalMap;
     }
 
     @Override
-    public Map<String, Integer> findDuplicate() {
+    public Map<String, List<Animal>> findDuplicate() {
         if(animalList == null) return null;
         Map<String, Integer> animalMap = new HashMap<>();
-        for(Animal animal : animalList) {
-            animalMap.put(
-                    createAnimalService.getAnimalType().name(),
-                    animalMap.getOrDefault(createAnimalService.getAnimalType().name(), 0) + 1
-            );
-        }
-        return animalMap;
+        return animalList.stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.groupingBy(Animal::getName));
+    }
+
+    @Override
+    public BigDecimal findAverageAge() {
+       double cost = animalList.stream()
+               .mapToInt(a -> Math.toIntExact(ChronoUnit.YEARS.between(LocalDate.now(), a.getBirthDate())))
+               .average().orElse(0.0);
+       return new BigDecimal(cost);
+    }
+
+    @Override
+    public List<Animal> findOldAndExpensive() {
+        return animalList.stream()
+                .filter(a -> Math.toIntExact(ChronoUnit.YEARS.between(LocalDate.now(), a.getBirthDate())) > 5 && a.getCost().compareTo(findAverageAge()) > 0)
+                .sorted(Comparator.comparing(Animal::getBirthDate))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> findMinCostAnimals() {
+        return animalList.stream()
+                .sorted()
+                .limit(3)
+                .map(Animal::getName)
+                .sorted(Comparator.reverseOrder())
+                .collect(Collectors.toList());
     }
 
     @Override
     public void printDuplicate() {
-        Map<String, Integer> duplicates = findDuplicate();
-        for(Map.Entry<String, Integer> duplicate : duplicates.entrySet()) {
+        Map<String, List<Animal>> duplicates = findDuplicate();
+        for(Map.Entry<String, List<Animal>> duplicate : duplicates.entrySet()) {
             System.out.println(duplicate.getKey() + " " + duplicate.getValue());
         }
     }

@@ -1,9 +1,9 @@
 package ru.mts.hwseven.repository;
 
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 import ru.mts.hwseven.entity.Animal;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -24,11 +24,13 @@ public interface AnimalRepository {
     Map<Animal, Integer> findOlderAnimal(int lowerAge);
     /**
      * Находит дубликаты животных и возвращает список дубликатов
-
-     * */
-    Map<String, Integer> findDuplicate();
+     */
+    Map<String, List<Animal>> findDuplicate();
     /**
      * Вызывает findDuplicate и выводит результат в стандартный поток
      * */
+    BigDecimal findAverageAge();
+    List<Animal> findOldAndExpensive();
+    List<String> findMinCostAnimals();
     void printDuplicate();
 }
