@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.cache.interceptor.CacheInterceptor;
 import org.springframework.test.context.ActiveProfiles;
 import ru.mts.hwseven.entity.Animal;
 import ru.mts.hwseven.entity.Cat;
@@ -25,6 +26,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -43,7 +46,9 @@ public class AnimalRepositoryTest {
     @DisplayName("Testing leap year names finding")
     @Test
     public void findLeapYearNames_shouldReturnEqualMap() {
-        Mockito.when(animalRepository.findLeapYearNames()).thenReturn(Map.of("TEST_NAME_ONE CAT", LocalDate.now()));
+        ConcurrentHashMap<String, LocalDate> givenMap = new ConcurrentHashMap<>();
+        givenMap.put("TEST_NAME_ONE CAT", LocalDate.now());
+        Mockito.when(animalRepository.findLeapYearNames()).thenReturn(givenMap);
         System.out.println("a");
     }
 
@@ -51,8 +56,8 @@ public class AnimalRepositoryTest {
     @Test
     public void testFindOlderAnimals_shouldEqualGivenMap() {
         LocalDate oldBirthDate = LocalDate.now();
-        Map<Animal, Integer> givenMap = Map.of(
-                new Cat("simple cat breed", "TEST_NAME_ONE", new BigDecimal("10"), "simple cat character", oldBirthDate), 3);
+        ConcurrentHashMap<Animal, Integer> givenMap = new ConcurrentHashMap<>();
+        givenMap.put(new Cat("simple cat breed", "TEST_NAME_ONE", new BigDecimal("10"), "simple cat character", oldBirthDate), 3);
         Mockito.when(animalRepository.findOlderAnimal(0)).thenReturn(givenMap);
     }
 
@@ -60,12 +65,13 @@ public class AnimalRepositoryTest {
     @Test
     public void testFindDuplicate_shouldReturnGivenMap() {
         LocalDate oldBirthDate = LocalDate.now();
-        Map<String, List<Animal>> animalMap = Map.of(
-            "CAT", List.of(
+        ConcurrentHashMap<String, List<Animal>> animalMap = new ConcurrentHashMap<>();
+        animalMap.put(
+                "CAT", List.of(
                         new Cat("simple cat breed", "TEST_NAME_ONE", new BigDecimal("10"), "simple cat character", oldBirthDate),
                         new Cat("simple cat breed", "TEST_NAME_ONE", new BigDecimal("10"), "simple cat character", oldBirthDate),
                         new Cat("simple cat breed", "TEST_NAME_ONE", new BigDecimal("10"), "simple cat character", oldBirthDate)
-        ));
+));
         Mockito.when(animalRepository.findDuplicate()).thenReturn(animalMap);
     }
 
@@ -78,13 +84,14 @@ public class AnimalRepositoryTest {
     @DisplayName("Testing finding old and expensive animals")
     @Test
     public void testFindOldAndExpensive_shouldReturnEmptyList() {
-        Mockito.when(animalRepository.findOldAndExpensive()).thenReturn(new ArrayList<>());
+        Mockito.when(animalRepository.findOldAndExpensive()).thenReturn(new CopyOnWriteArrayList<>());
     }
 
     @DisplayName("Testing finding min cost animals")
     @Test
     public void testFindMinCostAnimals_shouldReturnGivenList() {
-        Mockito.when(animalRepository.findMinCostAnimals()).thenReturn(List.of("TEST_NAME_ONE", "TEST_NAME_ONE", "TEST_NAME_ONE"));
+        CopyOnWriteArrayList<String> givenList = new CopyOnWriteArrayList<>(List.of("TEST_NAME_ONE", "TEST_NAME_ONE", "TEST_NAME_ONE"));
+        Mockito.when(animalRepository.findMinCostAnimals()).thenReturn(givenList);
 
     }
 
