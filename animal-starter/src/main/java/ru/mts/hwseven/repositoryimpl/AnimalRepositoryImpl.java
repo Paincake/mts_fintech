@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import ru.mts.hwseven.entity.Animal;
+import ru.mts.hwseven.exceptions.InvalidAgeException;
+import ru.mts.hwseven.exceptions.NoEntityException;
 import ru.mts.hwseven.repository.AnimalRepository;
 import ru.mts.hwseven.serviceimpl.CreateAnimalServiceImpl;
 
@@ -40,9 +42,11 @@ public class AnimalRepositoryImpl implements AnimalRepository {
                 .forEach(animal -> animalMap.put(animal.getName() + " " + createAnimalService.getAnimalType().name(), animal.getBirthDate()));
         return animalMap;
     }
-
     @Override
     public Map<Animal, Integer> findOlderAnimal(int lowerAge) {
+        if (lowerAge < 0) {
+            throw new InvalidAgeException("Invalid age: < 0");
+        }
         if(animalList == null) return new HashMap<>();
         Map<Animal, Integer> animalMap = new HashMap<>();
         animalList.stream()
@@ -78,6 +82,13 @@ public class AnimalRepositoryImpl implements AnimalRepository {
 
     @Override
     public List<String> findMinCostAnimals() {
+        try {
+            if (animalList.isEmpty()) {
+                throw new NoEntityException("findMinCostAnimals: empty animal list");
+            }
+        } catch (NoEntityException exc) {
+            System.out.println(exc.getMessage());
+        }
         return animalList.stream()
                 .sorted()
                 .limit(3)
@@ -96,16 +107,30 @@ public class AnimalRepositoryImpl implements AnimalRepository {
 
     @Scheduled(fixedDelay = 60000)
     public void callAllMethods() {
-        printDuplicate();
-        System.out.println("\nOlder animals:");
-        for(Map.Entry<Animal, Integer> animalEntry : findOlderAnimal(10).entrySet()) {
-            System.out.printf("%s %s ", animalEntry.getKey(), animalEntry.getValue());
-            System.out.println();
-        }
-        System.out.println("\nLeap year names:");
-        for(Map.Entry<String, LocalDate> animalEntry : findLeapYearNames().entrySet()) {
-            System.out.printf("%s %s ", animalEntry.getKey(), animalEntry.getValue());
-            System.out.println();
+        try {
+            printDuplicate();
+            System.out.println("\nOlder animals:");
+            for(Map.Entry<Animal, Integer> animalEntry : findOlderAnimal(10).entrySet()) {
+                System.out.printf("%s %s ", animalEntry.getKey(), animalEntry.getValue());
+                System.out.println();
+            }
+            System.out.println("\nLeap year names:");
+            for(Map.Entry<String, LocalDate> animalEntry : findLeapYearNames().entrySet()) {
+                System.out.printf("%s %s ", animalEntry.getKey(), animalEntry.getValue());
+                System.out.println();
+            }
+            System.out.printf("\nAverage age:\n%f\n", findAverageAge());
+            System.out.println("\nMinimum cost animals:");
+            for(String name : findMinCostAnimals()) {
+                System.out.println(name);
+            }
+
+            System.out.println("\nOld and expensive:");
+            for(Animal animal : findOldAndExpensive()) {
+                System.out.println(animal);
+            }
+        } catch (InvalidAgeException exception) {
+            System.out.println(exception.getMessage());
         }
     }
 
