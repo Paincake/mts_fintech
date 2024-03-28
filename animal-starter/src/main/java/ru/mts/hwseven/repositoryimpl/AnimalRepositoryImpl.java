@@ -60,9 +60,9 @@ public class AnimalRepositoryImpl implements AnimalRepository {
     @Override
     public ConcurrentHashMap<String, List<Animal>> findDuplicate() {
         if(animalList == null) return null;
-        return (ConcurrentHashMap<String, List<Animal>>) animalList.stream()
+        return new ConcurrentHashMap<>(animalList.stream()
                 .filter(Objects::nonNull)
-                .collect(Collectors.groupingBy(Animal::getName));
+                .collect(Collectors.groupingBy(Animal::getName)));
     }
 
     @Override
@@ -75,10 +75,10 @@ public class AnimalRepositoryImpl implements AnimalRepository {
 
     @Override
     public CopyOnWriteArrayList<Animal> findOldAndExpensive() {
-        return (CopyOnWriteArrayList<Animal>) animalList.stream()
+        return  animalList.stream()
                 .filter(animal -> Math.toIntExact(ChronoUnit.YEARS.between(LocalDate.now(), animal.getBirthDate())) > 5 && animal.getCost().compareTo(findAverageAge()) > 0)
                 .sorted(Comparator.comparing(Animal::getBirthDate))
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(CopyOnWriteArrayList::new));
     }
 
     @Override
@@ -90,12 +90,11 @@ public class AnimalRepositoryImpl implements AnimalRepository {
         } catch (NoEntityException exc) {
             System.out.println(exc.getMessage());
         }
-        return (CopyOnWriteArrayList<String>) animalList.stream()
+        return animalList.stream()
                 .sorted()
                 .limit(3)
                 .map(Animal::getName)
-                .sorted(Comparator.reverseOrder())
-                .collect(Collectors.toList());
+                .sorted(Comparator.reverseOrder()).collect(Collectors.toCollection(CopyOnWriteArrayList::new));
     }
 
     @Override
@@ -105,36 +104,6 @@ public class AnimalRepositoryImpl implements AnimalRepository {
             System.out.println(duplicate.getKey() + " " + duplicate.getValue());
         }
     }
-
-    @Scheduled(fixedDelay = 60000)
-    public void callAllMethods() {
-        try {
-            printDuplicate();
-            System.out.println("\nOlder animals:");
-            for(Map.Entry<Animal, Integer> animalEntry : findOlderAnimal(10).entrySet()) {
-                System.out.printf("%s %s ", animalEntry.getKey(), animalEntry.getValue());
-                System.out.println();
-            }
-            System.out.println("\nLeap year names:");
-            for(Map.Entry<String, LocalDate> animalEntry : findLeapYearNames().entrySet()) {
-                System.out.printf("%s %s ", animalEntry.getKey(), animalEntry.getValue());
-                System.out.println();
-            }
-            System.out.printf("\nAverage age:\n%f\n", findAverageAge());
-            System.out.println("\nMinimum cost animals:");
-            for(String name : findMinCostAnimals()) {
-                System.out.println(name);
-            }
-
-            System.out.println("\nOld and expensive:");
-            for(Animal animal : findOldAndExpensive()) {
-                System.out.println(animal);
-            }
-        } catch (InvalidAgeException exception) {
-            System.out.println(exception.getMessage());
-        }
-    }
-
 
     public CopyOnWriteArrayList<Animal> getAnimalList() {
         return animalList;
